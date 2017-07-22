@@ -1,0 +1,1 @@
+24 3 * * * sh /root/backup/run-ec2-consistent-snapshot-master.sh >> /root/backup/logs/log 2>&1

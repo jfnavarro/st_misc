@@ -1,0 +1,24 @@
+# This file is used by Jenkins to parse out error messages from the st_client build. The error messages will be
+# sent in the build report email, that is sent in case of build failure.
+
+ok /not really/
+
+# match line starting with 'error ', case-insensitive
+#error /(?i)^error /
+
+
+#error /^cc1plus: error: /
+error /: error: /
+
+#error /^FAILED: /
+
+# list of warnings here...
+#warning /[Ww]arning/
+#warning /WARNING/
+
+# create a quick access link to lines in the report containing 'INFO'
+info /INFO/
+
+# each line containing 'BUILD' represents the start of a section for grouping errors and warnings found after the line.
+# also creates a quick access link.
+start /BUILD/

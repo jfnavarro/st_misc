@@ -1,0 +1,17 @@
+<%                                                                                                                                                                                                                                    
+errorfound = 0
+
+  def pattern1= /^ERROR: .*$/
+  def pattern2= /^\[ERROR\] .*$/
+  def pattern3 = /^FAIL! .*$/
+  def pattern4 = /.*COMPILATION ERROR :.*$/
+    if (errorfound == 0) {
+      build.getLog(10000).each() { line -> 
+      if ((line ==~ pattern1 || line ==~ pattern2 || line ==~ pattern3) && ! ( line ==~ pattern4 ) && errorfound == 0) {
+        %><%= line %><%                                                                                                                                                                                                                                    
+        errorfound = 1
+      }
+    }
+
+}
+%>

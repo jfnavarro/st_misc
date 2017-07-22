@@ -1,0 +1,11 @@
+Number of Transcripts with Barcode present : 75629
+Number of unique Transcripts with Barcode present : 6218
+Number of unique Barcodes present : 4854
+Number of unique Genes present : 3502
+Reference mapping file : GRCm38
+Reference annotation file : ncbi
+Using bowtie2 contamination filter : Rn45s_Rn5s
+Nodes : 8
+Parameters : m(5)k(7)f(28)e(0)s(0)l(27)F(51)R(5)
+Mapper : bowtie2
+Annotation Tool :  HTSeq 

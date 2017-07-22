@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager"/>
+<role rolename="admin-gui"/>
+<role rolename="admin-script"/>
+<role rolename="admin"/>
+<user username="stmanager" password="10NGwifML" roles="manager-gui,admin-gui"/>
+</tomcat-users>

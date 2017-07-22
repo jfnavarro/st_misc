@@ -1,0 +1,45 @@
+Build result: ${build.result}
+Build URL: ${rooturl}${build.url}
+Project: ${project.name}
+Date of build: ${it.timestampString}
+Build duration: ${build.durationString}
+<%
+    for (hudson.model.Cause cause : build.causes) {
+%>${cause.shortDescription}
+<%
+    }
+%>
+
+Searching for "Error: " or "FAIL! " or "CMake Error" in the build log:
+
+<%                                                                                                                                                                                                                                    
+  def pattern1= /^ERROR: .*$/
+  def pattern2 = /^.*: error: .*$/
+  def pattern3 = /^FAIL! .*$/
+
+      build.getLog(10000).each() { line -> 
+      if (line ==~ pattern1 || line ==~ pattern2 || line ==~ pattern3) {
+        %>  <%= line %>
+<%                                                                                                                                                                                                                                    
+
+      }
+}
+%>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

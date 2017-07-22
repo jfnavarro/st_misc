@@ -1,0 +1,38 @@
+A tip:
+
+If you have ssh access to the servers st-ci-master, admin, db, admin-dev and db-dev, you edit the file ~/.ssh/config
+and add this information
+
+$ cat ~/.ssh/config
+Host ci
+    Hostname st-ci-master.spatialtranscriptomics.com
+    User root
+
+Host admin
+     Hostname admin.spatialtranscriptomics.com
+     	      User root
+
+Host admin-dev
+     Hostname admin-dev.spatialtranscriptomics.com
+     	      User root
+
+Host db
+     Hostname db.spatialtranscriptomics.com
+     	      User root
+
+Host db-dev
+     Hostname db-dev.spatialtranscriptomics.com
+     	      User root
+	      esjolund@zebra:~/aws$
+
+
+
+You will now be able to log in with:
+
+ssh ci
+
+and copy files with
+
+scp ci:/tmp/file /tmp
+
+

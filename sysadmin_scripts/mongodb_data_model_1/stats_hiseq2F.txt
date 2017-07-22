@@ -1,0 +1,11 @@
+Total reads mapping to barcodes 68568801
+Total barcodes 68451
+Total unique barcodes 14788
+Total unique genes 8220
+Reference mapping file : GRCm38 
+Reference annotation file : ncbi
+Using bowtie2 contamination filter : Rn45s_Rn5s
+Nodes : 8
+Parameters : m(5)k(7)f(28)e(0)s(0)l(27)F(51)R(5)
+Mapper : bowtie2
+Annotation Tool :  HTSeq 

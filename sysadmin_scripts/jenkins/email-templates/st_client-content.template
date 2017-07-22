@@ -1,0 +1,95 @@
+Build result: ${build.result}
+Build URL: ${rooturl}${build.url}
+Project: ${project.name}
+Date of build: ${it.timestampString}
+Build duration: ${build.durationString}
+<%
+    for (hudson.model.Cause cause : build.causes) {
+%>${cause.shortDescription}
+<%
+    }
+%>
+
+
+Searching for ": error: " or "FAIL! " or "CMake Error" in the build log:
+
+<%                                                                                                                                                                                                                                    
+errorfound = 0
+build.getRuns().each() { subRun ->                                                                                                                                                                                             
+  def pattern1= /^CMake Error.*$/
+  def pattern2 = /^.*: error: .*$/
+  def pattern3 = /^FAIL! .*$/
+    if (errorfound == 0) {
+      subRun.getLog(10000).each() { line -> 
+      if (line ==~ pattern1 || line ==~ pattern2 || line ==~ pattern3) {
+        %>  <%= line %>
+<%                                                                                                                                                                                                                                    
+        errorfound = 1
+      }
+    }
+  }
+}
+%>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ignore the rest of this email. Just trying out some groovy script for displaying changeset.
+-------------------------------------------------------------------------------------------
+
+<%
+
+def changeSet2 = build.changeSet
+if(changeSet2 != null) {
+  def hadChanges = false %>
+Changes in this build:
+<% changeSet2.each() { cs -> hadChanges = true %>
+  <%= cs.metaClass.hasProperty('commitId') ? cs.commitId : cs.metaClass.hasProperty('revision') ? cs.revision : cs.metaClass.hasProperty('changeNumber') ? cs.changeNumber : "" %>
+    <% cs.affectedFiles.each() 
+      {p -> %> [<%= cs.commitId[0..6] %>]: <%= cs.msgAnnotated %> | <%= cs.author %> | File: <%= p.path %> | Change type: <%= p.editType.name %>      
+    <%}   
+   }     
+    if(!hadChanges) { %>
+      No changes
+    <% }     
+} %>
+
+
+
+
+<% 
+def changeSet = build.changeSet
+if(changeSet != null) {
+  def hadChanges = false %>
+CHANGE SET
+<% changeSet.each() { cs ->
+     hadChanges = true %>
+      Revision <%= cs.metaClass.hasProperty('commitId') ? cs.commitId : cs.metaClass.hasProperty('revision') ? cs.revision : 
+        cs.metaClass.hasProperty('changeNumber') ? cs.changeNumber : "" %> by <%= cs.author %>: (<%= cs.msgAnnotated %>)
+<%	 cs.affectedFiles.each() { p -> %>
+	  change: <%= p.editType.name %> <%= p.path %>
+<%   }	   	      
+   }
+  if(!hadChanges) { %>
+  No changes
+<% }
+} %>
+

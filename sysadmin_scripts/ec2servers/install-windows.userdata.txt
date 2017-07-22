@@ -1,0 +1,63 @@
+<powershell>
+
+  # This powershell script is used as userdata when 
+  #
+  # aws ec2 run-instances --user-data file://install-windows.userdata.txt
+  #
+  # is called from the shell script
+  #
+  # install-windows.sh
+  #
+  # This script install cygwin and enables ssh login access.
+  # As much as possible of the requirements for building st-client are installed. But right now Qt and MSVC Express are only downloaded.
+  # A user needs to log in with rdesktop and install them manually.
+
+  $wc = New-Object System.Net.WebClient
+  $wc.DownloadFile("http://cygwin.com/setup-x86_64.exe", "setup-x86_64.exe")
+  .\setup-x86_64.exe --site http://mirrors.kernel.org/sourceware/cygwin/ --quiet-mode --local-package-dir C:\cygwin64\local_packages --packages "openssh,curl,util-linux,wget,git,procps,nano,shutdown,emacs" | Out-Null
+  C:\cygwin64\bin\bash.exe --login -c "mkdir ~/.ssh; curl 169.254.169.254/latest/meta-data/public-keys/0/openssh-key > ~/.ssh/authorized_keys"
+  C:\cygwin64\bin\bash.exe --login -c "ssh-host-config  --yes --user cyg_server --pwd hfU3fQa5JsKZXlLHKhh4ljh"
+  netsh advfirewall firewall add rule name="CYGWIN sshd" dir=in action=allow program="C:\cygwin64\usr\sbin\sshd.exe" enable=yes
+  $wc.DownloadFile("http://www.cmake.org/files/v3.3/cmake-3.3.1-win32-x86.exe", "C:\cmake-3.3.1-win32-x86.exe")
+  icacls.EXE C:\cmake-3.3.1-win32-x86.exe /grant:r Everyone:rx
+
+  # This password will later be used when want to login to this windows EC2 instance (either by "ssh" or by "rdesktop").
+  net user Administrator hfU3fQa5JsKZXlLHKhh4ljh
+
+  C:\cmake-3.3.1-win32-x86.exe /S
+
+  $wc.DownloadFile("http://downloads.sourceforge.net/project/libjpeg-turbo/1.4.1/libjpeg-turbo-1.4.1-vc64.exe", "C:\libjpeg-turbo-1.4.1-vc64.exe")
+  icacls.EXE C:\libjpeg-turbo-1.4.1-vc64.exe /grant:r Everyone:rx
+  C:\libjpeg-turbo-1.4.1-vc64.exe /S /D=C:\libjpeg-turbo64
+
+  $wc.DownloadFile("http://downloads.sourceforge.net/project/nsis/NSIS%202/2.46/nsis-2.46-setup.exe", "C:\nsis-2.46-setup.exe")
+  icacls.EXE C:\nsis-2.46-setup.exe /grant:r Everyone:rx
+  C:\nsis-2.46-setup.exe /S /D=C:\nsis
+
+  # The wdexpress_full.exe URL was found by clicking "download" here
+  # https://chocolatey.org/packages/VisualStudioExpress2013WindowsDesktop
+  # and unzipping and inspecting the file
+  # Tools/ChocolateyInstall.ps1
+
+  # Old URL: http://download.microsoft.com/download/A/F/9/AF95E6F8-2E6E-49D0-A48A-8E918D7FD768/VS2013.5.exe
+  $wc.DownloadFile("http://download.microsoft.com/download/7/2/E/72E0F986-D247-4289-B9DC-C4FB07374894/wdexpress_full.exe","C:\wdexpress_full.exe")
+  icacls.EXE C:\wdexpress_full.exe /grant:r Everyone:rx
+  C:\wdexpress_full.exe /Passive /NoRestart
+
+  # Maybe it is better to install through chocolatey?
+  # iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+  # choco install visualstudioexpress2013windowsdesktop
+
+  $wc.DownloadFile("http://download.qt.io/official_releases/qt/5.5/5.5.0/qt-opensource-windows-x86-msvc2013_64-5.5.0.exe","C:\qt-opensource-windows-x86-msvc2013_64-5.5.0.exe")
+  icacls.EXE C:\qt-opensource-windows-x86-msvc2013_64-5.5.0.exe /grant:r Everyone:rx
+
+  # We would here like to perform a command line install of Qt but there does not seem to be anyway to do it.
+  #
+  # Instead login via the ubuntu "rdesktop" command and run from the powershell the command:
+  # C:\qt-opensource-windows-x86-msvc2013_64-5.5.0.exe
+
+  # cyglsa-config will after configuring, reboot the computer
+  C:\cygwin64\bin\bash.exe --login -c "auto_answer=yes cyglsa-config"
+
+  Restart-Computer
+</powershell>

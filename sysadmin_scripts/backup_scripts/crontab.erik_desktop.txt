@@ -1,0 +1,3 @@
+26 4 * * *       /home/esjolund/aws/st_code/sysadmin_scripts/backup_scripts/backup-ci-master.sh >> /home/esjolund/aws/backup/log/backup-ci-master.txt 2>&1
+26 3 * * *       /home/esjolund/aws/st_code/sysadmin_scripts/backup_scripts/backup-s3.sh 3 /mnt/usb_backup/backup/s3/modulo_day_number >> /home/esjolund/aws/backup/log/backup-s3.txt 2>&1
+10 6 * * *       /home/esjolund/aws/st_code/sysadmin_scripts/backup_scripts/backup-db-to-local-harddrive.sh  >> /home/esjolund/aws/backup/log/backup-db-to-local-harddrive.txt 2>&1
