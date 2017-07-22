@@ -15,6 +15,8 @@ import os
 import sys
 import subprocess
 import glob
+import tempfile
+import shutil
 
 BUCKET_NAME = "featuresdev"
 
@@ -28,12 +30,22 @@ def run_command(command, out=subprocess.PIPE):
     except Exception as e:
         print str(e)
         raise e
-    
+
+print "Starting conversion of data in S3 from model 2 to model 3"    
+
+tmp_dir = tempfile.mkdtemp()
+os.chdir(tmp_dir)
+print "Using temp directory " + tmp_dir
+
+# Create S3 object
 s3 = boto3.resource('s3')
 # Print out all bucket names
+print "S3 buckets available"
 for bucket in s3.buckets.all():
     print(bucket.name)
     
+print "Using S3 bucket " + BUCKET_NAME
+
 # Download the feature's bucket files
 file_ids = list()
 for object in s3.Bucket(BUCKET_NAME).objects.all():
@@ -51,20 +63,21 @@ for file in file_ids:
     try:
         run_command(["gunzip", "-f", file])
     except Exception as e:
-        print "Error gunziping file " + str(file)
+        print "Error gunziping file " + str(file) + " "  + str(e)
         continue
     
-for file in file_ids:
+for file in glob.glob("*"):
     if file.find(".gz") != -1:
         print "Converting JSON to TSV, skipping file " + str(file)
         continue
     try:
-        clean_name = os.path.splitext(os.path.basename(file))[0]
-        os.rename(clean_name, clean_name + ".json")
-        new_file_name = clean_name + "_stdata.tsv"
-        run_command(["json_to_matrix.py", "--json-file", clean_name + ".json", "--outfile", new_file_name])
+        # We need to add the JSON extension so the conversion script works
+        json_file_name = file + ".json"
+        os.rename(file, json_file_name)
+        new_file_name = file + "_stdata.tsv"
+        run_command(["json_to_matrix.py", "--json-file", json_file_name, "--outfile", new_file_name])
     except Exception as e:
-        print "Error converting JSON to TSV " + str(file)
+        print "Error converting JSON to TSV " + str(file) + " "  + str(e)
         continue
  
 for file in glob.glob("*.tsv"):   
@@ -74,8 +87,23 @@ for file in glob.glob("*.tsv"):
         print "Error gzipping file " + str(file)
         continue
   
-for file in glob.glob("*.gz"):            
+for file in glob.glob("*.gz"):
+    key = file.split("_stdata")[0] + "/" + file
+    print "Uploading to S3 " + key            
     data = open(file, 'rb')
-    print "Uploading to S3 " + file
-    s3.Bucket(BUCKET_NAME).put_object(Key=file, Body=data)
-    data.close()
+    try:
+        s3.Bucket(BUCKET_NAME).put_object(Key=key, Body=data)
+        data.close()
+    except Exception as e:
+        print "Error uploading file to S3 " + str(e)
+        data.close()
+
+for file in file_ids:
+    print "Removing file from S3 " + file
+    try:
+        s3.Bucket(BUCKET_NAME).delete_object(Key=file)
+    except Exception as e:
+        print "Error deleting file in S3 " + str(e)
+            
+print "Done! removing temp folder"
+shutil.rmtree(tmp_dir)

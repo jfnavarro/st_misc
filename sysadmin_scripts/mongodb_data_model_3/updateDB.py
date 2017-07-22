@@ -73,6 +73,7 @@ def main(admin, password, host, port):
                 datasets.update_one({"_id": dataset_id}, {"$set": {"figure_blue": al["figure_blue"]}})
                 datasets.update_one({"_id": dataset_id}, {"$set": {"figure_red": al["figure_red"]}})
                 datasets.update_one({"_id": dataset_id}, {"$set": {"alignment_matrix": al["alignment_matrix"]}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"files": [dataset_id + "_stdata.tsv.gz"]}})
             else:
                 datasets.delete_one({"_id": dataset_id})
         except KeyError:
