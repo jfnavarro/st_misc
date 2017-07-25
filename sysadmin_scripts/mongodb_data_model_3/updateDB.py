@@ -52,6 +52,7 @@ def main(admin, password, host, port):
     ###############################################################################################################
     db_analysis = mongoConnection["analysis"]
     datasets = db_analysis["dataset"]
+    datasetinfos = db_analysis["datasetinfo"]
     imagealignments = db_analysis["imagealignment"]
     chips = db_analysis["chip"]
     # Remove the experiment database
@@ -63,6 +64,8 @@ def main(admin, password, host, port):
     datasets.update_many({}, {'$unset' : { 'overall_hit_quartiles' : 1}})
     datasets.update_many({}, {'$unset' : { 'gene_pooled_hit_quartiles' : 1}})
     datasets.update_many({}, {'$unset' : { 'obo_foundry_terms' : 1}})
+    # Remove one field in analaysis.dataset
+    datasetinfos.update_many({}, {'$unset' : { 'comment' : 1}})
     # Update the analysis.dataset collection to add the fields from analysis.imagealignment
     for ele in datasets.find():
         try:
