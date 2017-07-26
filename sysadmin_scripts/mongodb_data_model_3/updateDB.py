@@ -73,10 +73,11 @@ def main(admin, password, host, port):
             al_id = ele["image_alignment_id"]
             al = imagealignments.find_one({"_id": ObjectId(al_id)})
             if al_id is not None and al is not None:
-                datasets.update_one({"_id": dataset_id}, {"$set": {"figure_blue": al["figure_blue"]}})
-                datasets.update_one({"_id": dataset_id}, {"$set": {"figure_red": al["figure_red"]}})
-                datasets.update_one({"_id": dataset_id}, {"$set": {"alignment_matrix": al["alignment_matrix"]}})
-                datasets.update_one({"_id": dataset_id}, {"$set": {"files": [dataset_id + "_stdata.tsv.gz"]}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"figureHE": al["figure_blue"]}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"figureCy3": al["figure_red"]}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"alignmentMatrix": al["alignment_matrix"]}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"dataFile": dataset_id + "_stdata.tsv.gz"}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"files": []}})
             else:
                 datasets.delete_one({"_id": dataset_id})
         except KeyError:
