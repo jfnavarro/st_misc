@@ -28,7 +28,7 @@ def usage():
     print "  Updates the ST database from data model 2 to data model 3."
     print "  NOTE: It is a wise idea to manually run mongodump to create a backup of the data state prior to the update!"
 
-def main(admin, password, host, port):
+def main(user, password, host, port):
 
     print "Connecting to database..."
     mongoConnection = 0
@@ -43,7 +43,7 @@ def main(admin, password, host, port):
     print "Authorizing..."
     try:
         db_admin = mongoConnection["admin"]
-        db_admin.authenticate(admin, password)
+        db_admin.authenticate(user, password)
         print "Authorization Ok!"
     except TypeError,e:
         sys.stderr.write("There was an error in the authentication: " + str(e) + "\n")
@@ -71,12 +71,18 @@ def main(admin, password, host, port):
         try:
             dataset_id = ele["_id"]
             al_id = ele["image_alignment_id"]
-            al = imagealignments.find_one({"_id": ObjectId(al_id)})
-            if al_id is not None and al is not None:
+            valid = True
+            if al_id is None or al_id == "":
+                valid = False
+            else:
+                al = imagealignments.find_one({"_id": ObjectId(al_id)})
+                if al is None or al == "":
+                    valid = False
+            if valid:
                 datasets.update_one({"_id": dataset_id}, {"$set": {"figureHE": al["figure_blue"]}})
                 datasets.update_one({"_id": dataset_id}, {"$set": {"figureCy3": al["figure_red"]}})
                 datasets.update_one({"_id": dataset_id}, {"$set": {"alignmentMatrix": al["alignment_matrix"]}})
-                datasets.update_one({"_id": dataset_id}, {"$set": {"dataFile": dataset_id + "_stdata.tsv.gz"}})
+                datasets.update_one({"_id": dataset_id}, {"$set": {"dataFile": str(dataset_id) + "_stdata.tsv.gz"}})
                 datasets.update_one({"_id": dataset_id}, {"$set": {"files": []}})
             else:
                 datasets.delete_one({"_id": dataset_id})

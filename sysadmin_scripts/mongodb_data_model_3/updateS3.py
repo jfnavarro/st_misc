@@ -101,7 +101,7 @@ for file in glob.glob("*.gz"):
 for file in file_ids:
     print "Removing file from S3 " + file
     try:
-        s3.Bucket(BUCKET_NAME).delete_object(Key=file)
+        s3.Bucket(BUCKET_NAME).delete_key(Key=file)
     except Exception as e:
         print "Error deleting file in S3 " + str(e)
             
